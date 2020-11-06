@@ -42,6 +42,8 @@ try:
         defaultPB = "fpaste.org"
     elif release == 'ubuntu':
         defaultPB = "paste.ubuntu.com"
+    elif 'suse' in release:
+        defaultPB = 'paste.opensuse.org'
 except ImportError:
     pass
 
