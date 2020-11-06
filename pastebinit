@@ -22,9 +22,11 @@
 from __future__ import print_function
 
 import sys
+import os
 from configparser import ConfigParser, NoOptionError
 from urllib.parse import urlencode
 from urllib import request
+from binascii import hexlify
 
 # Set the default pastebin
 defaultPB = "pastebin.com"
@@ -414,6 +416,17 @@ try:
             else:
                 print(_("Could not find any json library."), file=sys.stderr)
                 sys.exit(1)
+        elif post_format == 'form':
+            boundary = hexlify(os.urandom(16)).decode()
+            data = '--{}\r\n'.format(boundary).join([
+                'Content-Disposition: form-data; name="{}"\r\n'
+                 '\r\n'
+                 '{}'
+                 '\r\n'.format(name, val) for name, val in params.items()
+            ])
+            data += '--{}--\r\n'.format(boundary)
+            params = data.encode()
+            req.add_header("Content-Type", "multipart/form-data; boundary={}".format(boundary))
         else:
             # Convert to a format usable with the HTML POST
             params = bytes(urlencode(params), encoding='US-ASCII')
